@@ -1,4 +1,4 @@
-using DocumentProcessor.Web.Components;
+﻿using DocumentProcessor.Web.Components;
 using DocumentProcessor.Web.Data;
 using DocumentProcessor.Web.Services;
 using DocumentProcessor.Web.Models;
@@ -29,8 +29,8 @@ try
             var password = secretsService.GetFieldFromSecret(secretJson, "password");
             var host = secretsService.GetFieldFromSecret(secretJson, "host");
             var port = secretsService.GetFieldFromSecret(secretJson, "port");
-            var dbname = "postgres";
-            connectionString = $"Host={host};Port={port};Database={dbname};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+            var dbname = "atxdps";
+            connectionString = $"Host={host};Port={port};Database={dbname};Username={username};Password={password}";
         }
         else throw new Exception("Secret was empty");
     }
@@ -54,10 +54,10 @@ catch (Exception ex)
 {
     Console.WriteLine($"Warning: Could not load connection string from AWS Secrets Manager: {ex.Message}");
     Console.WriteLine("Falling back to appsettings.json connection string");
-    connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Server=localhost;Database=DocumentProcessor;Integrated Security=true;TrustServerCertificate=True;";
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Host=localhost;Database=atxdps;";
 }
 
-builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(connectionString));
+builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(connectionString));
 builder.Services.AddScoped<DocumentRepository>();
 builder.Services.AddScoped<FileStorageService>();
 builder.Services.AddScoped<AIService>();
